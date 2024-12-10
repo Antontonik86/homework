@@ -11,11 +11,15 @@ api = ""
 bot = Bot(token=api)
 dp = Dispatcher(bot, storage=MemoryStorage())
 
-kb = ReplyKeyboardMarkup(resize_keyboard=True)
-button = KeyboardButton(text='Информация')
-button1 = KeyboardButton(text='Расчитать')
-kb.add(button)
-kb.add(button1)
+kb = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text='Информация'),
+            KeyboardButton(text='Рассчитать')
+        ]
+    ], resize_keyboard=True
+)
+
 
 
 
