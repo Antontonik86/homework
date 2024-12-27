@@ -28,6 +28,26 @@ def get_all_products():
     cursor.execute('SELECT id, title, description, price FROM Products')
     db = cursor.fetchall()
 
+def is_included(username):
+    connection = sqlite3.connect('users.db')
+    cursor = connection.cursor()
+    cursor.execute('SELECT * FROM Users WHERE username = ?', (username,))
+    user = cursor.fetchone()
+    connection.close()
+    return bool(user)
+
+
+def add_user(username, email, age, balance):
+    connection = sqlite3.connect('users.db')
+    cursor = connection.cursor()
+
+    cursor.execute('SELECT id, username, email, age, balance FROM Users')
+
+    if not is_included(username):
+        cursor.execute('INSERT INTO Users (username, email, age, balance) VALUES (?, ?, ?, ?)',
+                       (username, email, age, balance))
+    
+
     connection.commit()
     connection.close()
     return list(db)
