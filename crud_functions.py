@@ -1,54 +1,47 @@
 import sqlite3
 
+connection = sqlite3.connect('base.db')
+cursor = connection.cursor()
 
 def initiate_db():
-    connection = sqlite3.connect('products.db')
-    cursor = connection.cursor()
-    cursor.execute('DELETE FROM Products') # очищаем таблицу от предыдущих записей
-    # создаём таблицу и заполняем её данными
-    cursor.execute('''  
-    CREATE TABLE IF NOT EXISTS Products(     
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS Products(
     id INTEGER PRIMARY KEY,
     title TEXT NOT NULL,
     description TEXT,
-    price INTEGER NOT NULL);
+    price INTEGER NOT NULL
+    )
     ''')
-    for i in range(1, 5):
-        cursor.execute(
-                'INSERT INTO Products (title, description, price) VALUES (?, ?, ?)',
-            (f'Продукт {i}', f'Описание {i}', i * 100)
-                      )
-    connection.commit()
-    connection.close()
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS Products (
+    id INTEGER PRIMERY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    price INTEGER NOT NULL
+    )
+    ''')
 
+connection.commit()
+initiate_db()
+cursor.execute('DELETE FROM Products')
+for num in range(1, 5):
+    cursor.execute('INSERT INTO Products (title, description, price) VALUES (?, ?, ?)',
+                   (f'Продукт {num}', f'Описание {num}', num*100))
+    connection.commit()
 
 def get_all_products():
-    connection = sqlite3.connect('products.db')
-    cursor = connection.cursor()
-    cursor.execute('SELECT id, title, description, price FROM Products')
-    db = cursor.fetchall()
+    cursor.execute('SELECT * FROM Products')
+    return cursor.fetchall()
+
+def add_user(username, email, age):
+    cursor.execute("INSERT INTO Users (username, email, age, balance) VALUES (?, ?, ?, 1000)",
+                   (username, email, age))
+    connection.commit()
 
 def is_included(username):
-    connection = sqlite3.connect('users.db')
-    cursor = connection.cursor()
-    cursor.execute('SELECT * FROM Users WHERE username = ?', (username,))
-    user = cursor.fetchone()
-    connection.close()
-    return bool(user)
-
-
-def add_user(username, email, age, balance):
-    connection = sqlite3.connect('users.db')
-    cursor = connection.cursor()
-
-    cursor.execute('SELECT id, username, email, age, balance FROM Users')
-
-    if not is_included(username):
-        cursor.execute('INSERT INTO Users (username, email, age, balance) VALUES (?, ?, ?, ?)',
-                       (username, email, age, balance))
-    
-
-    connection.commit()
-    connection.close()
-    return list(db)
-
+    cursor.execute('SELECT * FROM Users')
+    users = cursor.fetchall()
+    for user in users:
+        if user[1] == username:
+            return True
+    return False
